@@ -66,6 +66,20 @@ module Testbot::Runner
       job.run(0)
     end
 
+    should "rereun the same spec again if it fails" do
+      job = Job.new(Runner.new({}), 10, "00:00", "project", "/tmp/testbot/user", "spec", "ruby", "spec/foo_spec.rb spec/bar_spec.rb")
+      flexmock(job).should_receive(:puts)
+      stub_duration(0)
+
+      expect_put_with(10, "result text", false)
+      flexmock(job).should_receive(:run_and_return_result).twice.
+        with("export RAILS_ENV=test; export TEST_ENV_NUMBER=; cd project; export RSPEC_COLOR=true; ruby -S bundle exec rspec spec/foo_spec.rb spec/bar_spec.rb").
+        and_return('result text')
+      flexmock(RubyEnv).should_receive(:bundler?).returns(true)
+      flexmock(job).should_receive(:success?).and_return(false)
+      job.run(0)
+    end
+
   end
 
 end

@@ -18,12 +18,16 @@ module Testbot::Runner
       return if @killed
       puts "Running job #{@id} (build #{@build_id})... "
       test_env_number = (instance == 0) ? '' : instance + 1
-      result = "\n#{`hostname`.chomp}:#{Dir.pwd}\n"
       base_environment = "export RAILS_ENV=test; export TEST_ENV_NUMBER=#{test_env_number}; cd #{@project};"
 
       adapter = Adapter.find(@type)
-      run_time = measure_run_time do
-        result += run_and_return_result("#{base_environment} #{adapter.command(@project, ruby_cmd, @files)}")
+     
+      result, run_time = "", 0
+      retry_tests_when_failing do 
+        result = "\n#{`hostname`.chomp}:#{Dir.pwd}\n"
+        run_time = measure_run_time do
+          result += run_and_return_result("#{base_environment} #{adapter.command(@project, ruby_cmd, @files)}")
+        end
       end
 
       Server.put("/jobs/#{@id}", :body => { :result => strip_invalid_utf8(result), :success => success?, :time => run_time })
@@ -39,6 +43,11 @@ module Testbot::Runner
     end
 
     private
+
+    def retry_tests_when_failing
+      yield
+      yield unless success?
+    end
 
     def strip_invalid_utf8(text)
       # http://po-ru.com/diary/fixing-invalid-utf-8-in-ruby-revisited/
