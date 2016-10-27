@@ -15,7 +15,7 @@ class SSHTunnel
       sleep 0.5
 
       if Time.now - start_time > 5
-        puts "SSH connection failed, trying again..."
+        puts "SSH connection failed, trying again... (#{@user}@#{@host})"
         start_time = Time.now
         connect
       end
