@@ -1,3 +1,7 @@
+0.7.10
+
+More helpful message on SSH connection errors.
+
 0.7.9
 
 Loosen sinatra dependency version constraint.
