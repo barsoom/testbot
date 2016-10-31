@@ -2,7 +2,7 @@ require 'rubygems'
 require 'net/ssh'
 
 class SSHTunnel
-  # 10 seconds was too short for users with poorer connections.
+  # We want a small number so this fails quickly when unreachable. But not too small: 10 seconds caused false negatives on a poor connection.
   TIMEOUT_SECONDS = 15
 
   def initialize(host, user, local_port = 2288)
