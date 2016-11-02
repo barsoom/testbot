@@ -1,3 +1,7 @@
+0.7.12
+
+Adjust SSH timeout to decrease risk of undesired parallel connections.
+
 0.7.11
 
 Longer SSH timeout to work better on poorer connections.
